@@ -21,7 +21,6 @@ namespace RegisterAndLoginServices.Controllers
         [HttpPost]
         public IActionResult Submit([FromQuery] string id, [FromQuery] string password)
         {
-            Console.WriteLine(GlobalVars.domain);
             return GetToken(id, password);
         }
 
@@ -45,8 +44,6 @@ namespace RegisterAndLoginServices.Controllers
                 return Ok(new { Error = e.Message });
             }
 
-            Console.WriteLine(userId + userType);
-
             // 生成 token 的 payload 部分
             var claims = new[]
             {
@@ -62,7 +59,7 @@ namespace RegisterAndLoginServices.Controllers
             // 生成 token
             var token = new JwtSecurityToken(
                 GlobalVars.domain,
-                GlobalVars.domain,
+                userType,
                 claims,
                 expires: DateTime.Now.AddMinutes(30),
                 signingCredentials: creds);
