@@ -33,7 +33,6 @@ namespace RegisterAndLoginServices.Services
                 try
                 {
                     var id = DbContext.DBstatic.Insertable(newReader).ExecuteReturnIdentity();
-                    Console.WriteLine("注册成功");
                     return id;
                 }
                 catch (MySqlException)
