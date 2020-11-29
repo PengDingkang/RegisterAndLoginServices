@@ -19,7 +19,7 @@ namespace RegisterAndLoginServices.Services
             /*todo: rewrite password check method*/
             try
             {
-                InfoCheck(reg, true, reg.password);
+                InfoCheck(reg, reg.password);
             }
             catch (Exception)
             {
@@ -32,21 +32,22 @@ namespace RegisterAndLoginServices.Services
         ///     检查用户信息输入合法性
         /// </summary>
         /// <param name="info">用户信息模型</param>
-        /// <param name="checkContactUsed">是否检查手机号重复</param>
         /// <param name="password">注册和修改时检查密码</param>
+        /// <param name="checkContact">是否检查手机号合法性</param>
+        /// <param name="checkContactUsed">是否检查手机号重复</param>
         /// <param name="checkPassword">是否检查密码合法性</param>
         /// <exception cref="Exception">问题字段</exception>
-        public static void InfoCheck(RegisterModel info, bool checkContactUsed, string password = null, bool checkPassword = true)
+        public static void InfoCheck(RegisterModel info, string password = null, bool checkContact = true, bool checkContactUsed = true, bool checkPassword = true)
         {
             try
             {
-                if (info.contact != null)
+                if (checkContact || !string.IsNullOrWhiteSpace(info.contact))
                 {
                     IsHandset(info.contact);
                     if (checkContactUsed) HandsetUsed(info.contact);
                 }
 
-                if (!string.IsNullOrEmpty(password) || checkPassword) IsValidPassword(password);
+                if (!string.IsNullOrWhiteSpace(password) || checkPassword) IsValidPassword(password);
             }
             catch (Exception)
             {
@@ -61,6 +62,12 @@ namespace RegisterAndLoginServices.Services
         /// <returns></returns>
         public static bool IsHandset(string str_handset)
         {
+
+            if (string.IsNullOrWhiteSpace(str_handset))
+            {
+                throw new Exception("Contact can not be null");
+            }
+
             if (Regex.IsMatch(str_handset, @"^1[3456789]\d{9}$") && str_handset.Length == 11)
             {
                 return true;
@@ -79,8 +86,11 @@ namespace RegisterAndLoginServices.Services
             var userId = DbContext.DBstatic.Queryable<User>()
                 .Select(f => new { f.id, f.contact })
                 .Where(it => it.contact == contact).First();
+
             if (userId == null)
+            {
                 return false;
+            }
             throw new Exception("Handset Used");
         }
 
@@ -93,6 +103,7 @@ namespace RegisterAndLoginServices.Services
         public static bool IsValidPassword(string password)
         {
             var rg = new Regex("^[A-Za-z0-9]{8,24}");
+
             if (string.IsNullOrWhiteSpace(password))
             {
                 throw new Exception("Password can not be null");
@@ -126,6 +137,14 @@ namespace RegisterAndLoginServices.Services
         /// <returns></returns>
         public static User VerifyPassword(long userId, string password)
         {
+            if (userId == 0)
+            {
+                throw new Exception("Id or phone number con not be null");
+            }
+            else if (string.IsNullOrWhiteSpace(password))
+            {
+                throw new Exception("Password con not be null");
+            }
             if (Regex.IsMatch(userId.ToString(), @"^1[3456789]\d{9}$") && userId.ToString().Length == 11)
             {
                 userId = FindPersonByContact(userId.ToString());
