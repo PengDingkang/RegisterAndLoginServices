@@ -1,11 +1,8 @@
 ﻿using RegisterAndLoginServices.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace RegisterAndLoginServices.Services
 {
@@ -37,8 +34,9 @@ namespace RegisterAndLoginServices.Services
         /// <param name="info">用户信息模型</param>
         /// <param name="checkContactUsed">是否检查手机号重复</param>
         /// <param name="password">注册和修改时检查密码</param>
+        /// <param name="checkPassword">是否检查密码合法性</param>
         /// <exception cref="Exception">问题字段</exception>
-        public static void InfoCheck(RegisterModel info, bool checkContactUsed, string password = null)
+        public static void InfoCheck(RegisterModel info, bool checkContactUsed, string password = null, bool checkPassword = true)
         {
             try
             {
@@ -48,7 +46,7 @@ namespace RegisterAndLoginServices.Services
                     if (checkContactUsed) HandsetUsed(info.contact);
                 }
 
-                if (password != null) IsValidPassword(password);
+                if (!string.IsNullOrEmpty(password) || checkPassword) IsValidPassword(password);
             }
             catch (Exception)
             {
@@ -64,7 +62,9 @@ namespace RegisterAndLoginServices.Services
         public static bool IsHandset(string str_handset)
         {
             if (Regex.IsMatch(str_handset, @"^1[3456789]\d{9}$") && str_handset.Length == 11)
+            {
                 return true;
+            }
             throw new Exception("Invalid phone number");
         }
 
@@ -89,11 +89,18 @@ namespace RegisterAndLoginServices.Services
         /// </summary>
         /// <param name="password">输入密码</param>
         /// <returns></returns>
-        /// <exception cref="Exception">密码不合法</exception>
+        /// <exception cref="Exception">密码不合法或为空</exception>
         public static bool IsValidPassword(string password)
         {
             var rg = new Regex("^[A-Za-z0-9]{8,24}");
-            if (rg.IsMatch(password) && password.Length <= 24) return true;
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                throw new Exception("Password can not be null");
+            }
+            if (rg.IsMatch(password) && password.Length <= 24)
+            {
+                return true;
+            }
             throw new Exception("Invalid password");
         }
 
@@ -115,9 +122,9 @@ namespace RegisterAndLoginServices.Services
         ///     验证用户密码是否正确
         /// </summary>
         /// <param name="userId">用户 ID</param>
-        /// <param name="input">输入的密码</param>
+        /// <param name="password">输入的密码</param>
         /// <returns></returns>
-        public static User VerifyPassword(long userId, string input)
+        public static User VerifyPassword(long userId, string password)
         {
             if (Regex.IsMatch(userId.ToString(), @"^1[3456789]\d{9}$") && userId.ToString().Length == 11)
             {
@@ -141,7 +148,7 @@ namespace RegisterAndLoginServices.Services
             }
 
             var getPersonById = DbContext.DBstatic.Queryable<User>().InSingle(userId);
-            if (getPersonById.passwordHash == EncryptPassword(input, getPersonById.salt))
+            if (getPersonById.passwordHash == EncryptPassword(password, getPersonById.salt))
             {
                 return getPersonById;
             }
