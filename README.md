@@ -48,7 +48,6 @@ cd ./RegisterAndLoginServices
 - 编译并运行
 
 ```shell
-dotnet build -c release
-./bin/Release/net5.0/RegisterAndLoginServices
+dotnet run -c release
 ```
 
