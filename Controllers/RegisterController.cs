@@ -27,13 +27,14 @@ namespace RegisterAndLoginServices.Controllers
             };
             try
             {
-                return Ok(new { 
-                    message = "Success", id = Register.AccepteRegister(info) 
+                return CreatedAtRoute(this.ControllerContext, new
+                { 
+                    message = "Success", id = Register.AccepteRegister(info)
                 });
             }
             catch (Exception ex)
             {
-                return Ok(new { error = ex.Message });
+                return BadRequest(new { error = ex.Message });
             }
         }
     }

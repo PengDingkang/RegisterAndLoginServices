@@ -21,17 +21,6 @@ namespace RegisterAndLoginServices.Controllers
         [HttpPost]
         public IActionResult Submit([FromQuery] string id, [FromQuery] string password)
         {
-            return GetToken(id, password);
-        }
-
-        /// <summary>
-        ///     私有方法，获取 JWT Token
-        /// </summary>
-        /// <param name="id">用户 ID</param>
-        /// <param name="password">用户密码</param>
-        /// <returns>Token</returns>
-        private IActionResult GetToken(string id, string password)
-        {
             int userId;
             string userType;
             try
@@ -41,7 +30,7 @@ namespace RegisterAndLoginServices.Controllers
             }
             catch (Exception e)
             {
-                return Ok(new { Error = e.Message });
+                return BadRequest(new { error = e.Message });
             }
 
             // 生成 token 的 payload 部分
