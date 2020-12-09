@@ -26,7 +26,11 @@ namespace RegisterAndLoginServices.Controllers
             try
             {
                 // 调用密码验证的方法，若密码不正确或其他输入不正确等情况抛出异常
-                (userId, userType) = GlobalFunctions.VerifyPassword(login.id, login.password);
+                (userId, userType) = GlobalFunctions.VerifyPassword(Convert.ToInt64(login.id), login.password);
+            }
+            catch (FormatException e)
+            {
+                return BadRequest(new { error = e.Message });
             }
             catch (Exception e)
             {
