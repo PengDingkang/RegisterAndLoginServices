@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using RegisterAndLoginServices.Models;
 
 namespace RegisterAndLoginServices.Controllers
 {
@@ -15,18 +16,17 @@ namespace RegisterAndLoginServices.Controllers
         /// <summary>
         ///     提交登录信息验证
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="password"></param>
+        /// <param name="login">登录信息模型</param>
         /// <returns>提交登录信息，返回 token</returns>
         [HttpPost]
-        public IActionResult Submit([FromQuery] string id, [FromQuery] string password)
+        public IActionResult Submit([FromBody] LoginModel login)
         {
             int userId;
             string userType;
             try
             {
                 // 调用密码验证的方法，若密码不正确或其他输入不正确等情况抛出异常
-                (userId, userType) = GlobalFunctions.VerifyPassword(Convert.ToInt64(id), password);
+                (userId, userType) = GlobalFunctions.VerifyPassword(login.id, login.password);
             }
             catch (Exception e)
             {

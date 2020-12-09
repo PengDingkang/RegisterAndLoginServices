@@ -9,21 +9,20 @@ namespace RegisterAndLoginServices.Controllers
     [ApiController]
     public class RegisterController : ControllerBase
     {
+        readonly string user = "user";
         /// <summary>
         ///     提交注册信息 API
         /// </summary>
-        /// <param name="name">用户名</param>
-        /// <param name="password">密码</param>
-        /// <param name="contact">联系方式</param>
+        /// <param name="register">注册信息模型</param>
         /// <returns>注册成功返回用户 ID，注册失败返回 error</returns>
         [HttpPost]
-        public IActionResult Submit([FromQuery] string contact, [FromQuery] string password)
+        public IActionResult Submit([FromBody] RegisterModel register)
         {
             var info = new RegisterModel
             {
-                password = password,
-                contact = contact,
-                userType = "user"
+                password = register.password,
+                contact = register.contact,
+                userType = user
             };
             try
             {
