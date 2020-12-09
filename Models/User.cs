@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using SqlSugar;
+﻿using SqlSugar;
 
 namespace RegisterAndLoginServices.Models
 {
@@ -27,10 +23,5 @@ namespace RegisterAndLoginServices.Models
             id = this.id;
             userTpye = this.userType;
         }
-    }
-
-    public class RegisterModel : User
-    {
-        public string password { get; set; }
     }
 }
