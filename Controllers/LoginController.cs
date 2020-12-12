@@ -52,7 +52,7 @@ namespace RegisterAndLoginServices.Controllers
             // 生成 token
             var token = new JwtSecurityToken(
                 GlobalVars.domain,
-                userType,
+                ToAudience(userType),
                 claims,
                 expires: DateTime.Now.AddMinutes(30),
                 signingCredentials: creds);
@@ -61,6 +61,22 @@ namespace RegisterAndLoginServices.Controllers
             {
                 token = new JwtSecurityTokenHandler().WriteToken(token)
             });
+        }
+
+        private static string ToAudience(string userType)
+        {
+            if (userType is "user")
+            {
+                return "user";
+            }
+            else if (userType is "suadmin" or "admin")
+            {
+                return "admin";
+            }
+            else
+            {
+                throw new Exception("Internal database error: user data is broken.");
+            }
         }
     }
 }
