@@ -1,4 +1,4 @@
-﻿namespace RegisterAndLoginServices.Controllers
+﻿namespace RegisterAndLoginServices.Models
 {
     public class ChangePasswordModel
     {
