@@ -54,7 +54,7 @@ namespace RegisterAndLoginServices.Controllers
                 GlobalVars.domain,
                 ToAudience(userType),
                 claims,
-                expires: DateTime.Now.AddMinutes(30),
+                expires: DateTime.Now.AddHours(1),
                 signingCredentials: creds);
             // 返回 token 给客户端使用
             return Ok(new
