@@ -2,10 +2,10 @@
 using System;
 using RegisterAndLoginServices.Services;
 using RegisterAndLoginServices.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication;
 using System.Linq;
 using System.Security.Claims;
+using Newtonsoft.Json.Linq;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace RegisterAndLoginServices.Controllers
 {
@@ -21,14 +21,27 @@ namespace RegisterAndLoginServices.Controllers
         /// <returns>注册成功返回用户 ID，注册失败返回 error</returns>
         [Route("api/[controller]")]
         [HttpPost]
-        public IActionResult Submit([FromBody] RegisterModel register)
+        public IActionResult Submit([FromBody] object registerString)
         {
+            RegisterModel register;
+
+            try
+            {
+                JObject jo = JObject.Parse(registerString.ToString());
+                register = jo.ToObject<RegisterModel>();
+            }
+            catch
+            {
+                return BadRequest(new { error = "Invalid input" });
+            }
+
             var info = new RegisterModel
             {
                 password = register.password,
                 contact = register.contact,
                 userType = user
             };
+
             try
             {
                 return CreatedAtRoute(this.ControllerContext, new
@@ -48,23 +61,34 @@ namespace RegisterAndLoginServices.Controllers
         /// <param name="register">注册信息模型</param>
         /// <returns>注册成功返回用户 ID，注册失败返回 error</returns>
         [Route("api/[controller]/admin")]
-        [Authorize]
         [HttpPost]
-        public IActionResult Admin([FromBody] RegisterModel register)
+        public IActionResult Admin([FromBody] object registerString)
         {
-            var auth = HttpContext.AuthenticateAsync();
-            var role = auth.Result.Principal.Claims.First(t => t.Type.Equals(ClaimTypes.Role))?.Value;
+            var auth = new JwtSecurityTokenHandler().ReadJwtToken(HttpContext.Request.Headers["authorization"].ToString().Split(' ')[1]);
+            var role = auth.Claims.First(t => t.Type.Equals(ClaimTypes.Role))?.Value;
             if(role is not "suadmin")
             {
                 return Forbid();
             }
+
+            RegisterModel register;
+            try
+            {
+                JObject jo = JObject.Parse(registerString.ToString());
+                register = jo.ToObject<RegisterModel>();
+            }
+            catch
+            {
+                return BadRequest(new { error = "Invalid input" });
+            }
+
             var info = new RegisterModel
             {
-                // TODO: Consider sending a random password with email.
                 password = register.password,
                 contact = register.contact,
                 userType = admin
             };
+
             try
             {
                 return CreatedAtRoute(this.ControllerContext, new
