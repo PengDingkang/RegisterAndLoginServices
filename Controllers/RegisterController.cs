@@ -45,8 +45,9 @@ namespace RegisterAndLoginServices.Controllers
             try
             {
                 return CreatedAtRoute(this.ControllerContext, new
-                { 
-                    message = "Success", id = Register.AccepteRegister(info)
+                {
+                    message = "Success",
+                    id = Register.AccepteRegister(info)
                 });
             }
             catch (Exception ex)
@@ -66,7 +67,7 @@ namespace RegisterAndLoginServices.Controllers
         {
             var auth = new JwtSecurityTokenHandler().ReadJwtToken(HttpContext.Request.Headers["authorization"].ToString().Split(' ')[1]);
             var role = auth.Claims.First(t => t.Type.Equals(ClaimTypes.Role))?.Value;
-            if(role is not "suadmin")
+            if (role is not "suadmin")
             {
                 return Forbid();
             }
