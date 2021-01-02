@@ -20,7 +20,7 @@ namespace RegisterAndLoginServices.Controllers
         /// <param name="jsonStr">新密码和旧密码的 json</param>
         /// <returns></returns>
         [HttpPut]
-        public IActionResult ChangePassword ([FromBody] object jsonStr)
+        public IActionResult ChangePassword([FromBody] object jsonStr)
         {
             int id;
             ChangePasswordModel model;

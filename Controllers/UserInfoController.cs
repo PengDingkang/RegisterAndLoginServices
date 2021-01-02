@@ -19,7 +19,7 @@ namespace RegisterAndLoginServices.Controllers
         /// <returns></returns>
         [Route("api/[controller]")]
         [HttpGet]
-        public async Task<IActionResult> GetInfo([FromQuery]string id = null)
+        public async Task<IActionResult> GetInfo([FromQuery] string id = null)
         {
             var auth = new JwtSecurityTokenHandler().ReadJwtToken(HttpContext.Request.Headers["authorization"].ToString().Split(' ')[1]);
             id ??= auth.Claims.First(t => t.Type.Equals(ClaimTypes.NameIdentifier))?.Value;
@@ -38,7 +38,7 @@ namespace RegisterAndLoginServices.Controllers
         /// <returns></returns>
         [Route("api/[controller]/{id}")]
         [HttpGet]
-        public async Task<IActionResult> GetInfoById([FromRoute]string id)
+        public async Task<IActionResult> GetInfoById([FromRoute] string id)
         {
             var auth = new JwtSecurityTokenHandler().ReadJwtToken(HttpContext.Request.Headers["authorization"].ToString().Split(' ')[1]);
             id ??= auth.Claims.First(t => t.Type.Equals(ClaimTypes.NameIdentifier))?.Value;
@@ -73,7 +73,7 @@ namespace RegisterAndLoginServices.Controllers
             }
             catch (NullReferenceException)
             {
-                return NotFound(new { error = "User not exist."});
+                return NotFound(new { error = "User not exist." });
             }
             catch (Exception e)
             {
