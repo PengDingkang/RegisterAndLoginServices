@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
@@ -8,11 +6,11 @@ using System.Threading.Tasks;
 using System.Security.Claims;
 using RegisterAndLoginServices.Services;
 using RegisterAndLoginServices.Models;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace RegisterAndLoginServices.Controllers
 {
     [ApiController]
-    [Authorize]
     public class UserInfoController : ControllerBase
     {
         /// <summary>
@@ -23,10 +21,10 @@ namespace RegisterAndLoginServices.Controllers
         [HttpGet]
         public async Task<IActionResult> GetInfo([FromQuery]string id = null)
         {
-            var auth = HttpContext.AuthenticateAsync();
-            id ??= auth.Result.Principal.Claims.First(t => t.Type.Equals(ClaimTypes.NameIdentifier))?.Value;
-            if (id == auth.Result.Principal.Claims.First(t => t.Type.Equals(ClaimTypes.NameIdentifier))?.Value
-                || auth.Result.Principal.Claims.First(t => t.Type.Equals(ClaimTypes.Role))?.Value is "admin" or "suadmin")
+            var auth = new JwtSecurityTokenHandler().ReadJwtToken(HttpContext.Request.Headers["authorization"].ToString().Split(' ')[1]);
+            id ??= auth.Claims.First(t => t.Type.Equals(ClaimTypes.NameIdentifier))?.Value;
+            if (id == auth.Claims.First(t => t.Type.Equals(ClaimTypes.NameIdentifier))?.Value
+                || auth.Claims.First(t => t.Type.Equals(ClaimTypes.Role))?.Value is "admin" or "suadmin")
             {
                 return await QueryUserInfo(id);
             }
@@ -42,10 +40,10 @@ namespace RegisterAndLoginServices.Controllers
         [HttpGet]
         public async Task<IActionResult> GetInfoById([FromRoute]string id)
         {
-            var auth = HttpContext.AuthenticateAsync();
-            id ??= auth.Result.Principal.Claims.First(t => t.Type.Equals(ClaimTypes.NameIdentifier))?.Value;
-            if (id == auth.Result.Principal.Claims.First(t => t.Type.Equals(ClaimTypes.NameIdentifier))?.Value
-                || auth.Result.Principal.Claims.First(t => t.Type.Equals(ClaimTypes.Role))?.Value is "admin" or "suadmin")
+            var auth = new JwtSecurityTokenHandler().ReadJwtToken(HttpContext.Request.Headers["authorization"].ToString().Split(' ')[1]);
+            id ??= auth.Claims.First(t => t.Type.Equals(ClaimTypes.NameIdentifier))?.Value;
+            if (id == auth.Claims.First(t => t.Type.Equals(ClaimTypes.NameIdentifier))?.Value
+                || auth.Claims.First(t => t.Type.Equals(ClaimTypes.Role))?.Value is "admin" or "suadmin")
             {
                 return await QueryUserInfo(id);
             }
